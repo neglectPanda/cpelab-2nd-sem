@@ -10,3 +10,8 @@
     <li>Log out</li>
   </ul>
 </p>
+
+<h2>balanceInquiry.c</h2>
+<p>
+  This function handles the checking of the balance inquiry of the account. It updates real time whenever the user either withdraws or deposits cash to their account 
+</p>
