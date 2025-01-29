@@ -22,6 +22,7 @@ float balanceInquiry(USER users[], int userIndex);
 float deposit(USER user[], int userIndex);
 float withdraw(USER user[], int userIndex);
 void transactionSummary(USER users[], int userIndex);
+void fileHandle(USER user[], int userIndex);
 
 int main(void) {
     int choice, userIndex;
@@ -127,6 +128,9 @@ int loginUser(USER users[]) {
             for (i = 0; i < USER_NUM; i++) {
                 if (users[i].passcode == inputPasscode) {
                     printf("SUCCESS: access code granted!\n");
+
+                    fileHandle(users, i);
+
                     return i; // Return index for the logged-in user
                 }
             }
@@ -158,6 +162,11 @@ float deposit(USER user[], int userIndex) {
 
     int transCount = user[userIndex].transactionCount;
 
+    if (transCount >= TRANS_NUM) {
+        printf("Transaction limit reached. Cannot perform more transactions.\n");
+        return user[userIndex].balance;
+    }
+
     while (1) {
         printf("\nInput amount to deposit: ");
         if ((scanf("%f%c", &amount, &ch)) == 2 && ch == '\n') {
@@ -168,6 +177,8 @@ float deposit(USER user[], int userIndex) {
 
                 strncpy(user[userIndex].transactionType[transCount], "DEPOSIT", 30);
                 printf("Current balance: %.2f\n\n", user[userIndex].balance);
+
+                fileHandle(user, userIndex);
             } else {
                 printf("Invalid amount deposited.\n\n");
             }
@@ -186,6 +197,11 @@ float withdraw(USER user[], int userIndex) {
     int transCount = user[userIndex].transactionCount;
     char ch;
 
+    if (transCount >= TRANS_NUM) {
+        printf("Transaction limit reached. Cannot perform more transactions.\n");
+        return user[userIndex].balance;
+    }
+
     while (1) {
         printf("Input amount to withdraw: Php ");
         if ((scanf("%f%c", &amount, &ch)) == 2 && ch == '\n') {
@@ -202,9 +218,12 @@ float withdraw(USER user[], int userIndex) {
             user[userIndex].balance -= amount;
             user[userIndex].transactionAmount[transCount] = amount;
             strncpy(user[userIndex].transactionType[transCount], "WITHDRAW", 30);
+
             user[userIndex].transactionCount++;
 
             printf("SUCCESS: current balance is now Php %.2f\n\n", user[userIndex].balance);
+
+            fileHandle(user, userIndex);
             break;
         } else {
             printf("ERROR: invalid input.\n\n");
@@ -226,5 +245,101 @@ void transactionSummary(USER users[], int userIndex) {
         printf("%-15d%-30s%-20.2f\n", i + 1, users[userIndex].transactionType[i], users[userIndex].transactionAmount[i]);
     }
 
+    return;
+}
+
+void fileHandle(USER users[], int userIndex) {
+    int i;
+    FILE *file = fopen("atm.txt", "r+");
+
+    if (!file) {
+        file = fopen("atm.txt", "w+");
+
+        if (!file) {
+            printf("ERROR: cannot open file!\n\n");
+            return;
+        }
+    }
+
+    // Read the entire file content into memory
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char *fileContent = (char *)malloc(fileSize + 1);
+    if (!fileContent) {
+        printf("ERROR: memory allocation failed!\n\n");
+        fclose(file);
+        return;
+    }
+
+    fread(fileContent, 1, fileSize, file);
+    fileContent[fileSize] = '\0'; // Null-terminate the file content
+
+    char userHeader[50];
+    snprintf(userHeader, sizeof(userHeader), "User %d", userIndex + 1);
+
+    // Check if the user section already exists in the file
+    char *userStart = strstr(fileContent, userHeader);
+    char *nextUserStart = NULL;
+
+    if (userStart) {
+        // Find the start of the next user section (if any)
+        nextUserStart = strstr(userStart + 1, "User ");
+    }
+
+    // Build the updated user section
+    char userSection[2000] = "";
+    snprintf(userSection, sizeof(userSection),
+             "%s\n                             Transaction Summary\n"
+             "=========================================================================\n"
+             "Transaction #         Transaction Type         Transaction Amount\n\n",
+             userHeader);
+
+    char transactionLine[200];
+    for (i = 0; i < users[userIndex].transactionCount; i++) {
+        snprintf(transactionLine, sizeof(transactionLine), "%-25d %-30s Php %.2f\n", i + 1, users[userIndex].transactionType[i], users[userIndex].transactionAmount[i]);
+        strcat(userSection, transactionLine);
+    }
+    strcat(userSection, "\n");
+
+    // Update the file content
+    char *newFileContent = (char *)malloc(fileSize + strlen(userSection) + 1);
+    if (!newFileContent) {
+        printf("ERROR: memory allocation failed!\n\n");
+        free(fileContent);
+        fclose(file);
+        return;
+    }
+
+        if (userStart) {
+        // Copy the content before the existing user section
+        size_t prefixLength = userStart - fileContent;
+        strncpy(newFileContent, fileContent, prefixLength);
+        newFileContent[prefixLength] = '\0';
+
+        // Append the updated user section
+        strcat(newFileContent, userSection);
+
+        // Append the remaining file content after the next user section, if any
+        if (nextUserStart) {
+            strcat(newFileContent, nextUserStart);
+        }
+    } else {
+        // If no user section found, append the new user section to the file content
+        strcpy(newFileContent, fileContent);
+        strcat(newFileContent, userSection);
+    }
+
+    // Write the updated content back to the file
+    freopen("atm.txt", "w", file); // Open file in write mode to overwrite
+    fputs(newFileContent, file);
+
+    // Cleanup memory and file pointers
+    free(fileContent);
+    free(newFileContent);
+    fclose(file);
+
+    printf("Transaction history updated successfully!\n");
     return;
 }

@@ -1,0 +1,24 @@
+User 1
+                             Transaction Summary
+=========================================================================
+Transaction #         Transaction Type         Transaction Amount
+
+
+User 2
+                             Transaction Summary
+=========================================================================
+Transaction #         Transaction Type         Transaction Amount
+
+1                         INQUIRY                        Php 0.00
+2                         DEPOSIT                        Php 1000.00
+3                         WITHDRAW                       Php 500.00
+
+User 3
+                             Transaction Summary
+=========================================================================
+Transaction #         Transaction Type         Transaction Amount
+
+1                         INQUIRY                        Php 0.00
+2                         DEPOSIT                        Php 1000.00
+3                         WITHDRAW                       Php 1000.00
+
