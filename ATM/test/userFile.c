@@ -10,7 +10,7 @@ void initializeUserFile() {
             return;
         }
         
-        // Initialize with default values
+        // the default init
         fprintf(fp, "User 1\n");
         fprintf(fp, "    passcode = 1234\n");
         fprintf(fp, "    balance = 0.00\n");
@@ -82,11 +82,11 @@ void updateUserFile(USER user[], int userIndex) {
                 fprintf(temp, "    passcode = %d\n", user[userIndex].passcode);
                 fprintf(temp, "    balance = %.2f\n", user[userIndex].balance);
                 
-                // Skip the next two lines in the original file
+                // two line skip of file
                 fgets(line, sizeof(line), fp);
                 fgets(line, sizeof(line), fp);
             } else {
-                // Copy the next two lines as they are
+                // the next 2 lines should be copied
                 if (fgets(line, sizeof(line), fp)) fprintf(temp, "%s", line);
                 if (fgets(line, sizeof(line), fp)) fprintf(temp, "%s", line);
             }

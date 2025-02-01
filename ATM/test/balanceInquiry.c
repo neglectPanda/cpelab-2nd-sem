@@ -3,6 +3,8 @@
 #include "utility.h"
 
 float balanceInquiry(USER user[], int userIndex) {
+    loadTransactions(user, userIndex);
+
     int transCount = user[userIndex].transactionCount;
     char transactionMsg[10] = "INQUIRY";
     int transactionMsgLen = strlen(transactionMsg);
