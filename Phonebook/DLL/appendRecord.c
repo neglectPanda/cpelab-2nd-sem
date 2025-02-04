@@ -6,6 +6,7 @@
 void appendRecord(NODE **head) {
     char inputName[20], ch; 
     char inputMobile[20];
+    NODE *check = *head;
 
     printf("\nAppending to records...\n");
     
@@ -16,6 +17,15 @@ void appendRecord(NODE **head) {
     printf("Input mobile: ");
     fgets(inputMobile, sizeof(inputMobile), stdin);
     inputMobile[strcspn(inputMobile, "\n")] = '\0';
+
+    check = *head;
+    while(check != NULL) {
+        if(strcmp(inputMobile, check->mobile) == 0) {
+            printf("ERROR: mobile number already exists!\n\n");
+            return;
+        }
+        check = check->next;
+    }
 
     NODE *newNode = createNode(inputName, inputMobile);
     if(newNode == NULL) {
@@ -30,8 +40,7 @@ void appendRecord(NODE **head) {
     NODE *temp = *head;
     // list traversal
     while(temp->next != NULL) {
-        temp->next = newNode;
-        newNode->prev = temp;
+        temp = temp->next;
     }
 
     //append

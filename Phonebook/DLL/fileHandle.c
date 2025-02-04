@@ -16,7 +16,6 @@ void saveToFile(NODE *head) {
     }
 
     fclose(file);
-    printf("SUCCESS: record is saved!\n\n");
 
     return;
 }
@@ -35,7 +34,7 @@ void loadFromFile(NODE **head) {
     while(fgets(line, sizeof(line), file)) {
         line[strcspn(line, "\n")] = '\0';
 
-        if(sscanf(line, "%[^,],%d", name, &mobile) == 2) {
+        if(sscanf(line, "%[^,],%[^\n]", name, &mobile) == 2) {
             NODE *newNode = createNode(name, mobile);
             if(newNode != NULL) {
 
@@ -44,8 +43,7 @@ void loadFromFile(NODE **head) {
                 } else {
                     NODE *temp = *head;
                     while(temp->next != NULL) {
-                        temp = newNode;
-                        newNode->prev = temp;
+                        temp = temp->next;
                     }
                     temp->next = newNode;
                     newNode->prev = temp;

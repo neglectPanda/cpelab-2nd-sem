@@ -20,6 +20,7 @@ int main() {
             case 'A':
             case 'a':
                 appendRecord(&head);
+                saveToFile(head);
                 break;
             case 'B':
             case 'b':
@@ -28,10 +29,12 @@ int main() {
             case 'C':
             case 'c':
                 changeRecord(head);
+                saveToFile(head);
                 break;
             case 'D':
             case 'd':
                 deleteRecord(&head);
+                saveToFile(head);
                 break;
             case 'E':
             case 'e':
