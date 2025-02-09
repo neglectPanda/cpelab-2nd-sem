@@ -10,9 +10,9 @@ void browseRecord(NODE *head) {
     }
 
     printf("=============== RECORDS ===============\n");
-    printf("Name:\t\tMobile No.:\n");
+    printf("%-20s %10s\n", "Name", "Mobile No.");
     while(temp != NULL) {
-        printf("%s\t\t%d\n", temp->name, temp->mobile);
+        printf("%-20s %05d\n", temp->name, temp->mobile);
         temp = temp->next;
     }
     

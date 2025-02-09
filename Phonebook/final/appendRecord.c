@@ -16,6 +16,12 @@ void appendRecord(NODE **head) {
     while(1) {
         printf("Input mobile number: ");
         if((scanf("%d%c", &inputMobile, &ch)) == 2 && ch == '\n') {
+
+            if(inputMobile < 0 || inputMobile > 99999) {
+                printf("ERROR: mobile number should only be 5 digits!\n\n");
+                continue;
+            }
+
             NODE *newNode = createNode(inputName, inputMobile);
 
             if(newNode == NULL) {
