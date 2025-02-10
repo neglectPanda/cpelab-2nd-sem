@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+// Structure for a record
 typedef struct record {
     char product[50];
     float price;
@@ -10,10 +11,12 @@ typedef struct record {
     struct record *next;
 } RECORD;
 
+// Structure for a queue
 typedef struct queue {
     RECORD *front, *back;
 } QUEUE;
 
+// Function prototypes
 void clearInputBuffer();
 void displayMenuOptions();
 
@@ -26,14 +29,14 @@ void show(QUEUE *q);
 int main() {
     int choice;
     char ch;
-    QUEUE q = {NULL, NULL}; //queue empty first
+    QUEUE q = {NULL, NULL}; // Initialize an empty queue
 
-    while(1) {
+    while (1) {
         displayMenuOptions();
         printf("Enter choice: ");
-        if((scanf("%d%c", &choice, &ch)) == 2 && ch == '\n') {
+        if ((scanf("%d%c", &choice, &ch)) == 2 && ch == '\n') {
 
-            switch(choice) {
+            switch (choice) {
                 case 1:
                     enqueueModule(&q);
                     break;
@@ -43,7 +46,7 @@ int main() {
                 case 3:
                     show(&q);
                     break;
-                case 4: 
+                case 4:
                     printf("Exiting...\n");
                     return 0;
                 default:
@@ -55,13 +58,12 @@ int main() {
             clearInputBuffer();
         }
     }
-    
+
     return 0;
 }
 
 void clearInputBuffer() {
-    while(getchar() != '\n');
-    return;
+    while (getchar() != '\n');
 }
 
 void displayMenuOptions() {
@@ -70,8 +72,6 @@ void displayMenuOptions() {
     printf("[2] - Dequeue\n");
     printf("[3] - Show\n");
     printf("[4] - Exit\n");
-
-    return;
 }
 
 void enqueueModule(QUEUE *q) {
@@ -82,9 +82,9 @@ void enqueueModule(QUEUE *q) {
     fgets(item.product, sizeof(item.product), stdin);
     item.product[strcspn(item.product, "\n")] = '\0';
 
-    while(1) {
+    while (1) {
         printf("Enter price: ");
-        if((scanf("%f%c", &item.price, &ch)) == 2 && ch == '\n') {
+        if ((scanf("%f%c", &item.price, &ch)) == 2 && ch == '\n') {
             break;
         } else {
             printf("ERROR: price is of type float!\n\n");
@@ -92,33 +92,31 @@ void enqueueModule(QUEUE *q) {
         }
     }
 
-    while(1) {
+    while (1) {
         printf("Enter quantity: ");
-        if((scanf("%d%c", &item.quantity, &ch)) == 2 && ch == '\n') {
-            if(item.quantity <= 0) {
-                printf("ERROR: it should be greater than 0!\n\n");
+        if ((scanf("%d%c", &item.quantity, &ch)) == 2 && ch == '\n') {
+            if (item.quantity <= 0) {
+                printf("ERROR: Quantity should be greater than 0!\n\n");
+                continue;
             }
-            
             break;
         } else {
-            printf("ERROR: quantity is of type int!\n\n");
+            printf("ERROR: Quantity is of type int!\n\n");
             clearInputBuffer();
         }
     }
 
     item.totalPrice = item.price * item.quantity;
 
-    if(enqueue(q, item)) {
-        printf("SUCCESS: record added!\n\n");
+    if (enqueue(q, item)) {
+        printf("SUCCESS: Record added!\n\n");
     } else {
-        printf("ERROR: malloc failed!\n\n");
+        printf("ERROR: Memory allocation failed!\n\n");
     }
-
-    return;
 }
 
 void dequeueModule(QUEUE *q) {
-    if(q->front == NULL) {
+    if (q->front == NULL) {
         printf("Queue is empty!\n\n");
         return;
     }
@@ -128,18 +126,15 @@ void dequeueModule(QUEUE *q) {
 }
 
 int enqueue(QUEUE *q, RECORD item) {
-    RECORD *newRecord = (RECORD *) malloc(sizeof(RECORD));
-    if(newRecord == NULL) {
-        return 0; // malloc failed
+    RECORD *newRecord = (RECORD *)malloc(sizeof(RECORD));
+    if (newRecord == NULL) {
+        return 0; // Memory allocation failed
     }
 
-    strcpy(newRecord->product, item.product);
-    newRecord->price = item.price;
-    newRecord->quantity = item.quantity;
-    newRecord->totalPrice = item.totalPrice;
+    *newRecord = item;
     newRecord->next = NULL;
 
-    if(q->back == NULL) {
+    if (q->back == NULL) {
         q->front = newRecord;
         q->back = newRecord;
     } else {
@@ -147,12 +142,13 @@ int enqueue(QUEUE *q, RECORD item) {
         q->back = newRecord;
     }
 
-    return 1; //success
+    return 1; // Success
 }
 
 RECORD dequeue(QUEUE *q) {
-    RECORD item = {"", 0, 0, 0, NULL}; //default emty
-    if(q->front == NULL) {
+    RECORD item = {"", 0, 0, 0, NULL}; // Default empty record
+
+    if (q->front == NULL) {
         return item;
     }
 
@@ -160,7 +156,7 @@ RECORD dequeue(QUEUE *q) {
     item = *temp;
     q->front = q->front->next;
 
-    if(q->front == NULL) {
+    if (q->front == NULL) {
         q->back = NULL;
     }
 
@@ -169,7 +165,7 @@ RECORD dequeue(QUEUE *q) {
 }
 
 void show(QUEUE *q) {
-    if(q->front == NULL) {
+    if (q->front == NULL) {
         printf("Queue is empty!\n\n");
         return;
     }
@@ -181,7 +177,7 @@ void show(QUEUE *q) {
     printf("%-15s %-15s %-15s %-15s\n", "Product", "Price", "Quantity", "Total Price");
     printf("----------------------------------------------------------------------\n");
 
-    while(current != NULL) {
+    while (current != NULL) {
         printf("%-15s %-15.2f %-15d %-15.2f\n", current->product, current->price, current->quantity, current->totalPrice);
         total += current->totalPrice;
         current = current->next;
@@ -189,9 +185,5 @@ void show(QUEUE *q) {
 
     printf("----------------------------------------------------------------------\n");
     printf("Total: %.2f\n", total);
-    printf("======================================================================\n");
-
-    printf("\n\n");
-
-    return;
+    printf("======================================================================\n\n");
 }
